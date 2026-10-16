@@ -1,0 +1,7 @@
+node_modules
+data/*.sqlite*
+data/hrms-encryption.key
+data/private-documents/
+.env
+dist
+.DS_Store
