@@ -211,6 +211,47 @@ if (!q("SELECT id FROM users WHERE role='admin' LIMIT 1")) {
   );
 }
 const secure = process.env.NODE_ENV === "production";
+const ALLOWED_ORIGIN = "https://people.macrowdigital.com";
+
+function corsHeaders(req) {
+  const origin = req.headers.origin;
+  if (origin === ALLOWED_ORIGIN) {
+    return {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Credentials": "true",
+      "Vary": "Origin",
+    };
+  }
+  return {};
+}
+
+function handleCors(req, res) {
+  const origin = req.headers.origin;
+  if (origin === ALLOWED_ORIGIN) {
+    res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Vary", "Origin");
+  }
+  if (req.method === "OPTIONS") {
+    if (origin === ALLOWED_ORIGIN) {
+      res.writeHead(204, {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, X-CSRF-Token",
+        "Access-Control-Max-Age": "86400",
+        "Vary": "Origin",
+      });
+      res.end();
+      return true;
+    }
+    res.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: "Origin not allowed." }));
+    return true;
+  }
+  return false;
+}
+
 function json(res, status, obj, headers = {}) {
   if (res.headersSent) return;
   res.writeHead(status, {
@@ -433,6 +474,7 @@ function addLog(userId, action, details) {
   activity(userId, userId, action, details);
 }
 async function route(req, res) {
+  if (handleCors(req, res)) return;
   const url = new URL(req.url, "http://localhost");
   const p = url.pathname;
   if (req.method === "GET" && p === "/health")
