@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { calculatePayrollDays } from "./payroll-days.mjs";
+import { API_BASE_URL } from "./config.js";
 
 const ADMIN_NAV = [
   ["Overview", "◫"],
@@ -75,18 +76,22 @@ function groupedNavigation(navigation, role) {
   ];
   return sections.map(([title, labels]) => [title, navigation.filter(([label]) => labels.includes(label))]).filter(([, items]) => items.length);
 }
+
 let csrf = "";
 async function api(url, options = {}) {
+  const fullUrl = url.startsWith("http://") || url.startsWith("https://")
+    ? url
+    : `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
   const headers = {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
   if (options.method && options.method !== "GET" && csrf)
     headers["X-CSRF-Token"] = csrf;
-  const response = await fetch(url, {
+  const response = await fetch(fullUrl, {
     ...options,
     headers,
-    credentials: "same-origin",
+    credentials: "include",
   });
   const data = await response
     .json()
