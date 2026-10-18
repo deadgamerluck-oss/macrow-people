@@ -56,15 +56,9 @@ function appBaseUrl() {
     .trim()
     .replace(/\/+$/, "");
   if (configured) {
-    const parsed = new URL(configured);
-    if (secure && parsed.protocol !== "https:")
-      fail(500, "APP_BASE_URL must use HTTPS in production.");
     return configured;
   }
-  if (secure) {
-    return "https://people.macrowdigital.com";
-  }
-  return `http://127.0.0.1:${Number(process.env.PORT) || 3000}`;
+  return "https://people.macrowdigital.com";
 }
 async function sendInviteEmail({
   to,
