@@ -78,9 +78,16 @@ async function sendInviteEmail({
     safeTitle = htmlEscape(title),
     safeDepartment = htmlEscape(department),
     safeUrl = htmlEscape(inviteUrl);
-  const logoPath = path.join(ROOT, "public", "assets", "macrow-digital-logo.png");
+  const logoPath = path.join(
+    ROOT,
+    "public",
+    "assets",
+    "macrow-digital-logo.png",
+  );
   const hasLogo = fs.existsSync(logoPath);
-  const logoSrc = hasLogo ? "cid:macrow-digital-logo" : `${base}/assets/macrow-digital-logo.png`;
+  const logoSrc = hasLogo
+    ? "cid:macrow-digital-logo"
+    : `${base}/assets/macrow-digital-logo.png`;
   const subject = `Macrow HRM — Activate Your Employee Account`;
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;border:1px solid #e2e8f0;border-radius:8px;">
@@ -1260,7 +1267,7 @@ const server = http.createServer(async (req, res) => {
     });
   }
 });
-const host = process.env.HOST || "127.0.0.1",
+const host = process.env.HOST || "0.0.0.0",
   port = Number(process.env.PORT) || 3000;
 server.listen(port, host, () =>
   console.log(
