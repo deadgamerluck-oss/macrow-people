@@ -58,8 +58,9 @@ function appBaseUrl() {
       fail(500, "APP_BASE_URL must use HTTPS in production.");
     return configured;
   }
-  if (secure)
-    fail(500, "Configure APP_BASE_URL before sending account invitations.");
+  if (secure) {
+    return "https://people.macrowdigital.com";
+  }
   return `http://127.0.0.1:${Number(process.env.PORT) || 3000}`;
 }
 async function sendInviteEmail({
@@ -88,21 +89,76 @@ async function sendInviteEmail({
   const logoSrc = hasLogo
     ? "cid:macrow-digital-logo"
     : `${base}/assets/macrow-digital-logo.png`;
-  const subject = `Macrow HRM — Activate Your Employee Account`;
+  const subject = `Activate Your Macrow People Account`;
+  const supportEmail = process.env.SUPPORT_EMAIL || "support@macrowdigital.com";
+  const safeSupport = htmlEscape(supportEmail);
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;border:1px solid #e2e8f0;border-radius:8px;">
-      <div style="background:#172235;padding:12px 16px;border-radius:8px;margin-bottom:22px;"><img src="${logoSrc}" alt="Macrow Digital" style="max-width:240px;height:auto;display:block;"></div>
-      <h2 style="color:#0f172a;margin-top:0;">Welcome to Macrow Digital!</h2>
-      <p>Hello <b>${safeName}</b>,</p>
-      <p>Your employee account has been created. You have been invited to join Macrow People${safeTitle ? ` as <b>${safeTitle}</b>` : ""}${safeDepartment ? ` (${safeDepartment})` : ""}. Create your password using the secure link below.</p>
-      <p style="margin:24px 0;">
-        <a href="${safeUrl}" style="background:#fb4818;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block;">Activate Your Account</a>
-      </p>
-      <p style="color:#64748b;font-size:13px;">If the button does not work, copy this link into your browser:<br><a href="${safeUrl}">${safeUrl}</a></p>
-      <p style="color:#64748b;font-size:12px;margin-top:30px;border-top:1px solid #f1f5f9;padding-top:12px;">This one-time link expires in 7 days. Do not share it. If you did not expect this invitation, contact your HR administrator.</p>
-      <p style="color:#64748b;font-size:12px;">Macrow HR Team · ${htmlEscape(process.env.SUPPORT_EMAIL || "Contact your HR administrator")}</p>
-    </div>`;
-  const text = `Hello ${name},\n\nWelcome to Macrow HRMS. Your employee account has been created. Set your password and activate it here:\n${inviteUrl}\n\nThis one-time link expires in 7 days. Do not share it. If you did not expect this invitation, contact your HR administrator.\n\nRegards,\nMacrow HR Team`;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activate Your Account · Macrow People</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f5f7fb;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(21,36,71,0.06);">
+          <!-- Header -->
+          <tr>
+            <td style="background:#152447;padding:24px 32px;text-align:left;">
+              <img src="${logoSrc}" alt="Macrow Digital" style="max-height:38px;width:auto;display:block;border:0;">
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 32px 24px;color:#202b3c;line-height:1.6;">
+              <h1 style="margin:0 0 16px;color:#152447;font-size:22px;font-weight:700;letter-spacing:-0.4px;">Welcome to Macrow Digital!</h1>
+              <p style="margin:0 0 14px;font-size:15px;color:#202b3c;">Hello <b>${safeName}</b>,</p>
+              <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+                Your employee account is ready on <b>Macrow People</b>${safeTitle ? ` as <b>${safeTitle}</b>` : ""}${safeDepartment ? ` in the <b>${safeDepartment}</b> team` : ""}. Please activate your account and set your secure password to get started.
+              </p>
+              <!-- Button -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:28px 0;">
+                <tr>
+                  <td align="center" style="border-radius:8px;background:linear-gradient(135deg,#fb4818,#ed3d15);box-shadow:0 4px 12px rgba(251,72,24,0.25);">
+                    <a href="${safeUrl}" target="_blank" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:8px;letter-spacing:0.2px;">
+                      Activate Your Account &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0 0 8px;font-size:13px;color:#64748b;">
+                If the button above doesn't work, copy and paste this link into your browser:
+              </p>
+              <p style="margin:0 0 24px;font-size:12px;word-break:break-all;">
+                <a href="${safeUrl}" target="_blank" style="color:#f04416;text-decoration:underline;">${safeUrl}</a>
+              </p>
+              <!-- Expiry Note -->
+              <div style="background:#f8fafc;border-left:3px solid #fb4818;border-radius:4px;padding:12px 16px;margin:24px 0 0;">
+                <p style="margin:0;font-size:12px;color:#64748b;line-height:1.5;">
+                  <b>Security notice:</b> This single-use link will expire in <b>7 days</b>. Please do not forward or share this email.
+                </p>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 32px 28px;background:#fafbfc;border-top:1px solid #f1f5f9;color:#94a3b8;font-size:12px;line-height:1.5;text-align:left;">
+              <p style="margin:0 0 4px;color:#64748b;font-weight:600;">Macrow People HRMS · Macrow Digital</p>
+              <p style="margin:0;">
+                Portal: <a href="${base}" style="color:#64748b;text-decoration:underline;">${base}</a> &nbsp;|&nbsp; Need help? Contact <a href="mailto:${safeSupport}" style="color:#64748b;text-decoration:underline;">${safeSupport}</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+  const text = `Hello ${name},\n\nWelcome to Macrow Digital! Your account has been created on Macrow People.\n\nActivate your account and set your password using this link:\n${inviteUrl}\n\nThis one-time link expires in 7 days.\n\nPortal: ${base}\nSupport: ${supportEmail}\n\nRegards,\nMacrow HR Team`;
   if (mailer) {
     try {
       const mailOptions = {
@@ -540,14 +596,9 @@ async function route(req, res) {
   if (req.method === "POST" && p === "/api/logout") {
     const u = currentUser(req);
     if (u) {
-      run(
-        "DELETE FROM sessions WHERE token_hash=?",
-        hash(
-          parseCookies(req)[
-            secure ? "__Host-macrow_session" : "macrow_session"
-          ],
-        ),
-      );
+      const c = parseCookies(req);
+      const token = c["__Host-macrow_session"] || c["macrow_session"];
+      if (token) run("DELETE FROM sessions WHERE token_hash=?", hash(token));
       audit(u.id, "Signed out", "session", u.id);
     }
     clearCookie(res);
