@@ -830,7 +830,7 @@ async function route(req, res) {
       id: inviteId,
       expiresInDays: 7,
       emailDelivery: mailStatus,
-      activationUrl: mailStatus.mode === "demo" ? fullInviteUrl : null,
+      activationUrl: !mailStatus.accepted || mailStatus.mode === "demo" ? fullInviteUrl : null,
     });
   }
   if (
