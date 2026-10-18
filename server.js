@@ -193,14 +193,11 @@ async function sendInviteEmail({
         };
       return { accepted: true, mode: "smtp", sentAt: now() };
     } catch (err) {
-      console.error("[SMTP Invite Send Failed]", {
-        code: err.code || "SEND_FAILED",
-        command: err.command || "send",
-      });
+      console.error("[SMTP Invite Send Failed]", err);
       return {
         accepted: false,
         mode: "smtp",
-        error: "The mail service could not accept the message.",
+        error: err.message || "The mail service could not accept the message.",
       };
     }
   } else {
@@ -897,7 +894,7 @@ async function route(req, res) {
     return json(res, 200, {
       emailDelivery: mailStatus,
       expiresInDays: 7,
-      activationUrl: mailStatus.mode === "demo" ? fullInviteUrl : null,
+      activationUrl: !mailStatus.accepted || mailStatus.mode === "demo" ? fullInviteUrl : null,
     });
   }
   if (req.method === "GET" && p === "/api/leave-rules") {
