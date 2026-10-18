@@ -268,9 +268,11 @@ function json(res, status, obj, headers = {}) {
 }
 function cookie(res, token, maxAge = 28800) {
   let name = secure ? "__Host-macrow_session" : "macrow_session";
+  const sameSite = secure ? "None" : "Lax";
+  const secureAttr = secure ? "; Secure" : "";
   res.setHeader(
     "Set-Cookie",
-    `${name}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure ? "; Secure" : ""}`,
+    `${name}=${token}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAge}${secureAttr}`,
   );
 }
 function clearCookie(res) {
@@ -339,7 +341,7 @@ function activity(user, actor, action, details = "") {
 }
 function currentUser(req) {
   const c = parseCookies(req),
-    token = c[secure ? "__Host-macrow_session" : "macrow_session"];
+    token = c["__Host-macrow_session"] || c["macrow_session"];
   if (!token) return null;
   const s = q(
     "SELECT user_id,csrf FROM sessions WHERE token_hash=? AND expires_at>? ",
