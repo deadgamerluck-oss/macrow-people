@@ -270,9 +270,10 @@ function Empty({ children = "No records yet." }) {
   return <div className="empty">{children}</div>;
 }
 
-function AuthScreen({ setup, onSuccess }) {
+function AuthScreen({ setup, initialToken, onSuccess }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
   async function submit(event) {
     event.preventDefault();
     setError("");
@@ -291,6 +292,12 @@ function AuthScreen({ setup, onSuccess }) {
       setBusy(false);
     }
   }
+  function copyToken() {
+    if (!initialToken) return;
+    navigator.clipboard.writeText(initialToken);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
   return (
     <div className="login-page">
       <section className="login-brand">
@@ -307,7 +314,7 @@ function AuthScreen({ setup, onSuccess }) {
           <h2>{setup ? "Create administrator" : "Welcome back"}</h2>
           <p className="help">
             {setup
-              ? "Use the one-time setup token printed in the server terminal."
+              ? "First-run initial setup. Enter your details to create the first admin."
               : "Sign in with your invited work account."}
           </p>
           {error && (
@@ -317,8 +324,23 @@ function AuthScreen({ setup, onSuccess }) {
           )}
           {setup && (
             <>
-              <Field name="token" label="Setup token" />
-              <Field name="name" label="Your name" />
+              {initialToken && (
+                <div style={{ background: "#fff5f1", border: "1px solid #f97316", borderRadius: "8px", padding: "12px", marginBottom: "14px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: "700", color: "#c2410c", marginBottom: "4px" }}>
+                    FIRST-RUN SETUP TOKEN
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <code style={{ fontSize: "12px", background: "#ffffff", padding: "6px 8px", borderRadius: "4px", border: "1px solid #fed7aa", wordBreak: "break-all", flex: 1, userSelect: "all" }}>
+                      {initialToken}
+                    </code>
+                    <button type="button" onClick={copyToken} style={{ fontSize: "11px", padding: "6px 10px", borderRadius: "4px", border: "1px solid #f97316", background: "#f97316", color: "#ffffff", cursor: "pointer", fontWeight: "600", whiteSpace: "nowrap" }}>
+                      {copied ? "Copied!" : "Copy"}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <Field name="token" label="Setup token" defaultValue={initialToken || ""} required />
+              <Field name="name" label="Your name" required />
             </>
           )}
           <Field name="email" label="Work email" type="email" />
@@ -406,7 +428,7 @@ function InviteApp() {
 }
 
 function App() {
-  const [auth, setAuth] = useState({ loading: true, setup: false, user: null });
+  const [auth, setAuth] = useState({ loading: true, setup: false, setupToken: null, user: null });
   const [page, setPage] = useState("Overview");
   const [notice, setNotice] = useState("");
   const [modal, setModal] = useState(null);
@@ -418,21 +440,21 @@ function App() {
       try {
         const status = await api("/api/setup-status");
         if (status.needed) {
-          setAuth({ loading: false, setup: true, user: null });
+          setAuth({ loading: false, setup: true, setupToken: status.token, user: null });
           return;
         }
         const session = await api("/api/me");
         csrf = session.csrf || "";
-        setAuth({ loading: false, setup: false, user: session.user });
+        setAuth({ loading: false, setup: false, setupToken: null, user: session.user });
       } catch (e) {
-        setAuth({ loading: false, setup: false, user: null });
+        setAuth({ loading: false, setup: false, setupToken: null, user: null });
         setNotice(e.message);
       }
     })();
   }, [invitation]);
   const onAuth = (result) => {
     csrf = result.csrf || "";
-    setAuth({ loading: false, setup: false, user: result.user });
+    setAuth({ loading: false, setup: false, setupToken: null, user: result.user });
     setPage("Overview");
   };
   const toast = useCallback((message) => {
@@ -446,7 +468,7 @@ function App() {
   if (!auth.user)
     return (
       <>
-        <AuthScreen setup={auth.setup} onSuccess={onAuth} />
+        <AuthScreen setup={auth.setup} initialToken={auth.setupToken} onSuccess={onAuth} />
         {notice && (
           <div className="notice show" role="status">
             <div className="notice-card">

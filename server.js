@@ -263,29 +263,25 @@ if (!q("SELECT id FROM users WHERE role='admin' LIMIT 1")) {
 const secure = process.env.NODE_ENV === "production";
 const ALLOWED_ORIGIN = "https://people.macrowdigital.com";
 
-function corsHeaders(req) {
-  const origin = req.headers.origin;
-  if (origin === ALLOWED_ORIGIN) {
-    return {
-      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-      "Access-Control-Allow-Credentials": "true",
-      "Vary": "Origin",
-    };
-  }
-  return {};
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  if (origin === ALLOWED_ORIGIN) return true;
+  if (!secure && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin))
+    return true;
+  return false;
 }
 
 function handleCors(req, res) {
   const origin = req.headers.origin;
-  if (origin === ALLOWED_ORIGIN) {
-    res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  if (isAllowedOrigin(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Vary", "Origin");
   }
   if (req.method === "OPTIONS") {
-    if (origin === ALLOWED_ORIGIN) {
+    if (isAllowedOrigin(origin)) {
       res.writeHead(204, {
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, X-CSRF-Token",
@@ -310,7 +306,7 @@ function json(res, status, obj, headers = {}) {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "no-referrer",
     "Content-Security-Policy":
-      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://macrow-people-1.onrender.com https://people.macrowdigital.com; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
     "X-Frame-Options": "DENY",
     ...headers,
   });
@@ -534,6 +530,7 @@ async function route(req, res) {
   if (req.method === "GET" && p === "/api/setup-status")
     return json(res, 200, {
       needed: !q("SELECT id FROM users WHERE role='admin' LIMIT 1"),
+      token: setupToken,
     });
   if (req.method === "POST" && p === "/api/setup") {
     if (!setupToken || q("SELECT id FROM users WHERE role='admin' LIMIT 1"))
@@ -1344,7 +1341,7 @@ const server = http.createServer(async (req, res) => {
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "no-referrer",
       "Content-Security-Policy":
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://macrow-people-1.onrender.com https://people.macrowdigital.com; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
       "X-Frame-Options": "DENY",
       "Cache-Control": "no-store",
     });
