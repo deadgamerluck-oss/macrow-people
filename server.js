@@ -814,37 +814,23 @@ async function route(req, res) {
       "pending",
     );
     const fullInviteUrl = `${appBaseUrl()}/accept-invite.html#${token}`;
-    const mailStatus = await sendInviteEmail({
-      to: em,
-      name,
-      inviteUrl: fullInviteUrl,
-      role,
-      title,
-      department,
-    });
     run(
-      "UPDATE invites SET email_status=?,sent_at=? WHERE id=?",
-      mailStatus.accepted ? "sent" : "failed",
-      mailStatus.accepted ? mailStatus.sentAt : null,
+      "UPDATE invites SET email_status='sent',sent_at=? WHERE id=?",
+      created,
       inviteId,
     );
     audit(
       user.id,
-      mailStatus.accepted
-        ? "Invitation email accepted for sending"
-        : "Invitation email could not be sent",
+      "Generated invite link",
       "invite",
       em,
-      mailStatus.mode,
+      "link",
     );
     return json(res, 201, {
       id: inviteId,
       expiresInDays: 7,
-      emailDelivery: mailStatus,
-      activationUrl:
-        !mailStatus.accepted || mailStatus.mode === "demo"
-          ? fullInviteUrl
-          : null,
+      emailDelivery: { accepted: true, mode: "link" },
+      activationUrl: fullInviteUrl,
     });
   }
   if (
@@ -882,36 +868,22 @@ async function route(req, res) {
       inviteId,
     );
     const fullInviteUrl = `${appBaseUrl()}/accept-invite.html#${token}`;
-    const mailStatus = await sendInviteEmail({
-      to: invite.email,
-      name: invite.name,
-      inviteUrl: fullInviteUrl,
-      role: invite.role,
-      title: invite.title,
-      department: invite.department,
-    });
     run(
-      "UPDATE invites SET email_status=?,sent_at=? WHERE id=?",
-      mailStatus.accepted ? "sent" : "failed",
-      mailStatus.accepted ? mailStatus.sentAt : null,
+      "UPDATE invites SET email_status='sent',sent_at=? WHERE id=?",
+      created,
       inviteId,
     );
     audit(
       user.id,
-      mailStatus.accepted
-        ? "Resent invitation email"
-        : "Invitation resend failed",
+      "Generated new invite link",
       "invite",
       invite.email,
-      mailStatus.mode,
+      "link",
     );
     return json(res, 200, {
-      emailDelivery: mailStatus,
+      emailDelivery: { accepted: true, mode: "link" },
       expiresInDays: 7,
-      activationUrl:
-        !mailStatus.accepted || mailStatus.mode === "demo"
-          ? fullInviteUrl
-          : null,
+      activationUrl: fullInviteUrl,
     });
   }
   if (req.method === "GET" && p === "/api/leave-rules") {

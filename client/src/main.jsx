@@ -802,16 +802,11 @@ function PageContent({ user, page, setPage, toast, setModal, refresh, refreshPag
           setResult({
             url: r.activationUrl || "",
             expiresInDays: r.expiresInDays,
-            accepted: !!r.emailDelivery?.accepted,
-            mode: r.emailDelivery?.mode,
-            error: r.emailDelivery?.error,
+            accepted: true,
+            mode: "link",
           });
           form.reset();
-          successMessage = r.emailDelivery?.accepted
-            ? "Invitation email accepted for sending."
-            : r.emailDelivery?.mode === "demo"
-              ? "Email is not configured. Copy the trial activation link; no email was sent."
-              : "Unable to send the email. Please try again.";
+          successMessage = "Invite link generated successfully.";
           toast(successMessage);
           await reload();
           return;
@@ -1097,9 +1092,9 @@ function PageContent({ user, page, setPage, toast, setModal, refresh, refreshPag
   function confirmResend(item) {
     setModal({
       type: "confirm",
-      title: "Resend activation email?",
-      description: `Send a new one-time activation link to ${item.name} at ${item.email}? The previous link will stop working.`,
-      confirmLabel: item.status === "Not Invited" ? "Create login" : "Resend invitation",
+      title: "Generate new invite link?",
+      description: `Generate a new one-time activation link for ${item.name} (${item.email})? The previous link will stop working.`,
+      confirmLabel: item.status === "Not Invited" ? "Create login" : "Generate new link",
       busy: false,
       submit: async (event) => {
         event.preventDefault();
@@ -1107,8 +1102,8 @@ function PageContent({ user, page, setPage, toast, setModal, refresh, refreshPag
         try {
           const response = await api(`/api/hrm/invitations/${item.id}/resend`, { method: "POST", body: "{}" });
           setModal(null);
-          setResult({ url: response.activationUrl || "", accepted: !!response.emailDelivery?.accepted, mode: response.emailDelivery?.mode, expiresInDays: response.expiresInDays });
-          toast(response.emailDelivery?.accepted ? "Activation email accepted for sending." : response.emailDelivery?.mode === "demo" ? "Email is not configured. Copy the trial activation link; no email was sent." : "Unable to send the email. Please try again.");
+          setResult({ url: response.activationUrl || "", accepted: true, mode: "link", expiresInDays: response.expiresInDays });
+          toast("New invite link generated successfully.");
           await reload();
         } catch (error) {
           setModal((current) => ({ ...current, busy: false, error: error.message }));
@@ -1294,11 +1289,11 @@ function PageContent({ user, page, setPage, toast, setModal, refresh, refreshPag
             <SelectField name="location" label="Work arrangement" options={["Onsite", "Remote", "Hybrid"].map((x) => [x, x])} />
             <SelectField name="role" label="Account role" options={[["employee", "Employee"], ["hr_manager", "HR Manager"], ["payroll_manager", "Payroll Manager"], ["manager", "Department Manager"]]} />
             <div className="field full invite-submit">
-              <Button primary disabled={busyForm === "invite"}>{busyForm === "invite" ? "Sending invitation…" : "Create login & invite"}</Button>
+              <Button primary disabled={busyForm === "invite"}>{busyForm === "invite" ? "Generating link…" : "Create login & generate link"}</Button>
               {commonFormError}
-              {result && typeof result === "object" && <div className={`invite-result ${result.accepted ? "success" : "pending"}`}>
-                <div><b>{result.accepted ? "Invitation email accepted for sending" : result.mode === "demo" ? "Trial link ready · no email was sent" : "Unable to send the email"}</b><span>{result.accepted ? "The mail service accepted the message. Inbox delivery can take a little time." : result.error || "Retry from the employee’s onboarding row."}</span></div>
-                {result.url && <div className="copy-link"><input aria-label="Trial activation link" readOnly value={result.url} onFocus={(e) => e.target.select()} /><Button type="button" onClick={async () => { try { await navigator.clipboard.writeText(result.url); toast("Activation link copied."); } catch { toast("Select the activation link and copy it manually."); } }}>Copy link</Button></div>}
+              {result && typeof result === "object" && <div className="invite-result success">
+                <div><b>Invite link generated successfully</b><span>Share this link directly with the team member to activate their account.</span></div>
+                {result.url && <div className="copy-link"><input aria-label="Invite activation link" readOnly value={result.url} onFocus={(e) => e.target.select()} /><Button type="button" onClick={async () => { try { await navigator.clipboard.writeText(result.url); toast("Activation link copied."); } catch { toast("Select the activation link and copy it manually."); } }}>Copy link</Button></div>}
                 <small>Link expires in {result.expiresInDays} days · single use</small>
               </div>}
             </div>
