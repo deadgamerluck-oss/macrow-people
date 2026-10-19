@@ -98,14 +98,16 @@ async function sendInviteEmail({
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Activate Your Account · Macrow People</title>
   <style>
-    @media only screen and (max-width: 640px) {
+    @media only screen and (max-width: 680px) {
       .email-container { width: 100% !important; border-radius: 8px !important; }
-      .email-header { padding: 20px 24px !important; }
-      .email-body { padding: 28px 20px 20px !important; }
-      .email-footer { padding: 18px 20px 24px !important; }
-      .main-heading { font-size: 22px !important; }
-      .body-text { font-size: 15px !important; line-height: 1.6 !important; }
-      .action-btn { width: 100% !important; text-align: center !important; padding: 16px 20px !important; box-sizing: border-box !important; }
+      .email-header { padding: 22px 24px !important; }
+      .email-body { padding: 32px 24px 24px !important; }
+      .email-footer { padding: 22px 24px 28px !important; }
+      .main-heading { font-size: 25px !important; line-height: 1.3 !important; }
+      .body-text { font-size: 18px !important; line-height: 1.6 !important; }
+      .action-btn { width: 100% !important; text-align: center !important; padding: 18px 24px !important; font-size: 19px !important; box-sizing: border-box !important; }
+      .link-box { font-size: 14px !important; padding: 12px 14px !important; }
+      .notice-text { font-size: 15px !important; }
     }
   </style>
 </head>
@@ -114,40 +116,40 @@ async function sendInviteEmail({
     <tr>
       <td align="center">
         <!-- Container -->
-        <table role="presentation" class="email-container" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:640px;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,0.06);">
+        <table role="presentation" class="email-container" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:680px;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 12px 36px rgba(15,23,42,0.07);">
           <!-- Header -->
           <tr>
-            <td class="email-header" style="background:#152447;padding:26px 36px;text-align:left;">
-              <img src="${logoSrc}" alt="Macrow Digital" style="max-height:42px;width:auto;display:block;border:0;">
+            <td class="email-header" style="background:#152447;padding:28px 40px;text-align:left;">
+              <img src="${logoSrc}" alt="Macrow Digital" style="max-height:46px;width:auto;display:block;border:0;">
             </td>
           </tr>
           <!-- Body -->
           <tr>
-            <td class="email-body" style="padding:40px 36px 30px;color:#1e293b;line-height:1.65;">
-              <h1 class="main-heading" style="margin:0 0 18px;color:#0f172a;font-size:25px;font-weight:700;letter-spacing:-0.5px;">Welcome to Macrow Digital!</h1>
-              <p class="body-text" style="margin:0 0 16px;font-size:16px;color:#1e293b;">Hello <b>${safeName}</b>,</p>
-              <p class="body-text" style="margin:0 0 24px;font-size:16px;color:#334155;line-height:1.65;">
+            <td class="email-body" style="padding:44px 40px 36px;color:#1e293b;line-height:1.65;">
+              <h1 class="main-heading" style="margin:0 0 22px;color:#0f172a;font-size:30px;font-weight:700;line-height:1.28;letter-spacing:-0.5px;">Welcome to Macrow Digital!</h1>
+              <p class="body-text" style="margin:0 0 18px;font-size:20px;color:#1e293b;line-height:1.65;">Hello <b>${safeName}</b>,</p>
+              <p class="body-text" style="margin:0 0 28px;font-size:20px;color:#334155;line-height:1.65;">
                 Your employee account is ready on <b>Macrow People</b>${safeTitle ? ` as <b>${safeTitle}</b>` : ""}${safeDepartment ? ` in the <b>${safeDepartment}</b> team` : ""}. Please activate your account and set your secure password to get started.
               </p>
               <!-- Button -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:28px 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:32px 0;">
                 <tr>
                   <td align="left">
-                    <a class="action-btn" href="${safeUrl}" target="_blank" style="display:inline-block;padding:15px 34px;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:8px;background:linear-gradient(135deg,#fb4818,#ea380c);box-shadow:0 4px 14px rgba(251,72,24,0.3);letter-spacing:0.2px;">
+                    <a class="action-btn" href="${safeUrl}" target="_blank" style="display:inline-block;padding:18px 40px;font-size:20px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;background:linear-gradient(135deg,#fb4818,#ea380c);box-shadow:0 6px 18px rgba(251,72,24,0.32);letter-spacing:0.2px;">
                       Activate Your Account &rarr;
                     </a>
                   </td>
                 </tr>
               </table>
-              <p style="margin:0 0 10px;font-size:14px;color:#64748b;line-height:1.5;">
+              <p style="margin:0 0 12px;font-size:16px;color:#64748b;line-height:1.5;">
                 If the button above doesn't work, copy and paste this link into your browser:
               </p>
-              <p style="margin:0 0 26px;font-size:13px;line-height:1.6;word-break:break-all;background:#f8fafc;padding:12px 14px;border:1px solid #e2e8f0;border-radius:6px;">
+              <p class="link-box" style="margin:0 0 30px;font-size:15px;line-height:1.6;word-break:break-all;background:#f8fafc;padding:14px 18px;border:1px solid #e2e8f0;border-radius:8px;">
                 <a href="${safeUrl}" target="_blank" style="color:#e03e13;text-decoration:underline;font-family:monospace,sans-serif;">${safeUrl}</a>
               </p>
               <!-- Expiry Note -->
-              <div style="background:#fff7ed;border-left:4px solid #fb4818;border-radius:4px;padding:14px 18px;margin:24px 0 0;">
-                <p style="margin:0;font-size:13px;color:#9a3412;line-height:1.55;">
+              <div style="background:#fff7ed;border-left:4px solid #fb4818;border-radius:6px;padding:16px 20px;margin:28px 0 0;">
+                <p class="notice-text" style="margin:0;font-size:16px;color:#9a3412;line-height:1.6;">
                   <b>Security Notice:</b> This single-use link will expire in <b>7 days</b>. Please do not forward or share this email with anyone.
                 </p>
               </div>
@@ -155,8 +157,8 @@ async function sendInviteEmail({
           </tr>
           <!-- Footer -->
           <tr>
-            <td class="email-footer" style="padding:22px 36px 30px;background:#f8fafc;border-top:1px solid #edf2f7;color:#64748b;font-size:13px;line-height:1.6;text-align:left;">
-              <p style="margin:0 0 6px;color:#334155;font-weight:600;font-size:14px;">Macrow People HRMS · Macrow Digital</p>
+            <td class="email-footer" style="padding:26px 40px 32px;background:#f8fafc;border-top:1px solid #edf2f7;color:#64748b;font-size:15px;line-height:1.6;text-align:left;">
+              <p style="margin:0 0 8px;color:#334155;font-weight:600;font-size:16px;">Macrow People HRMS · Macrow Digital</p>
               <p style="margin:0;color:#64748b;">
                 Portal: <a href="${base}" style="color:#0284c7;text-decoration:underline;">${base}</a> &nbsp;|&nbsp; Need help? Contact <a href="mailto:${safeSupport}" style="color:#0284c7;text-decoration:underline;">${safeSupport}</a>
               </p>
