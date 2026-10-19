@@ -55,7 +55,11 @@ function appBaseUrl() {
   const configured = String(process.env.APP_BASE_URL || "")
     .trim()
     .replace(/\/+$/, "");
-  if (configured && !configured.includes("127.0.0.1") && !configured.includes("localhost")) {
+  if (
+    configured &&
+    !configured.includes("127.0.0.1") &&
+    !configured.includes("localhost")
+  ) {
     return configured;
   }
   return "https://people.macrowdigital.com";
@@ -141,11 +145,11 @@ async function sendInviteEmail({
                   </td>
                 </tr>
               </table>
-              <p style="margin:0 0 12px;font-size:16px;color:#64748b;line-height:1.5;">
+              <p style="margin:0 0 14px;font-size:18px;color:#64748b;line-height:1.5;">
                 If the button above doesn't work, copy and paste this link into your browser:
               </p>
-              <p class="link-box" style="margin:0 0 30px;font-size:15px;line-height:1.6;word-break:break-all;background:#f8fafc;padding:14px 18px;border:1px solid #e2e8f0;border-radius:8px;">
-                <a href="${safeUrl}" target="_blank" style="color:#e03e13;text-decoration:underline;font-family:monospace,sans-serif;">${safeUrl}</a>
+              <p class="link-box" style="margin:0 0 32px;font-size:18px;line-height:1.6;word-break:break-all;background:#f8fafc;padding:16px 20px;border:1px solid #e2e8f0;border-radius:8px;">
+                <a href="${safeUrl}" target="_blank" style="color:#e03e13;text-decoration:underline;font-family:monospace,sans-serif;font-size:18px;">${safeUrl}</a>
               </p>
               <!-- Expiry Note -->
               <div style="background:#fff7ed;border-left:4px solid #fb4818;border-radius:6px;padding:16px 20px;margin:28px 0 0;">
@@ -298,10 +302,11 @@ function handleCors(req, res) {
       res.writeHead(204, {
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Methods":
+          "GET, POST, PUT, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, X-CSRF-Token",
         "Access-Control-Max-Age": "86400",
-        "Vary": "Origin",
+        Vary: "Origin",
       });
       res.end();
       return true;
@@ -836,7 +841,10 @@ async function route(req, res) {
       id: inviteId,
       expiresInDays: 7,
       emailDelivery: mailStatus,
-      activationUrl: !mailStatus.accepted || mailStatus.mode === "demo" ? fullInviteUrl : null,
+      activationUrl:
+        !mailStatus.accepted || mailStatus.mode === "demo"
+          ? fullInviteUrl
+          : null,
     });
   }
   if (
@@ -900,7 +908,10 @@ async function route(req, res) {
     return json(res, 200, {
       emailDelivery: mailStatus,
       expiresInDays: 7,
-      activationUrl: !mailStatus.accepted || mailStatus.mode === "demo" ? fullInviteUrl : null,
+      activationUrl:
+        !mailStatus.accepted || mailStatus.mode === "demo"
+          ? fullInviteUrl
+          : null,
     });
   }
   if (req.method === "GET" && p === "/api/leave-rules") {
