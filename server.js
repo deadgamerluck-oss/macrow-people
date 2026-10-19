@@ -55,7 +55,7 @@ function appBaseUrl() {
   const configured = String(process.env.APP_BASE_URL || "")
     .trim()
     .replace(/\/+$/, "");
-  if (configured) {
+  if (configured && !configured.includes("127.0.0.1") && !configured.includes("localhost")) {
     return configured;
   }
   return "https://people.macrowdigital.com";
